@@ -9,24 +9,23 @@ from datetime import datetime
 from zipfile import ZipFile
 import os
 
-THRESHOLD = 5  # audio levels not normalised.
-CHUNK_SIZE = 4096 # prepei na alaxei
-SILENT_CHUNKS = 3 * 44100 / 4096  # about 3sec perimenei 1 deuterolepto
+THRESHOLD = 5 
+CHUNK_SIZE = 4096
+SILENT_CHUNKS = 3 * 44100 / 4096  
 FORMAT = pyaudio.paInt16
-FRAME_MAX_VALUE = 2 ** 15 - 1 # total number of frames
+FRAME_MAX_VALUE = 2 ** 15 - 1
 NORMALIZE_MINUS_ONE_dB = 10 ** (-1.0 / 20)
-RATE = 44100 # arithmos samples gia 1 sec, se Hz
-CHANNELS = 1 # 1=mono 2=stereo
+RATE = 44100 
+CHANNELS = 1 
 TRIM_APPEND = RATE / 4
 
-# vlepei an exei hsuxia
+
 def is_silent(data_chunk):
     """Returns 'True' if below the 'silent' threshold"""
     return max(data_chunk) < THRESHOLD
 
 def normalize(data_all):
     """Amplify the volume out to max -1dB"""
-    # MAXIMUM = 16384
     normalize_factor = (float(NORMALIZE_MINUS_ONE_dB * FRAME_MAX_VALUE)
                         / max(abs(i) for i in data_all))
 
@@ -35,7 +34,6 @@ def normalize(data_all):
         r.append(int(i * normalize_factor))
     return r
 
-# kovei to keno apo thn arxh kai to telos
 def trim(data_all):
     _from = 0
     _to = len(data_all) - 1
@@ -63,7 +61,6 @@ def record():
     data_all = array('h')
 
     while True:
-        # little endian, signed short
         data_chunk = array('h', stream.read(CHUNK_SIZE))
         if byteorder == 'big':
             data_chunk.byteswap()
@@ -86,7 +83,7 @@ def record():
     stream.close()
     p.terminate()
 
-    data_all = trim(data_all)  # we trim before normalize as threshhold applies to un-normalized wave (as well as is_silent() function)
+    data_all = trim(data_all) 
     data_all = normalize(data_all)
     return sample_width, data_all
 
@@ -104,7 +101,7 @@ def record_to_file(path):
 
 if __name__ == '__main__':
     
-    #record_to_file(str(int(time.time()))+'.wav')
+  
     while True:
         print("Wait in silence to begin recording; wait in silence to terminate")
         date_1 = time.strftime("%Y%m%d-%H%M%S")
